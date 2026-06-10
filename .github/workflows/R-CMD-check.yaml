@@ -60,7 +60,13 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          ZIPFILE=$(find "${{ matrix.config.artifact }}" -type f -name "*.zip" -print -quit)
+          - name: Debug files
+          pwd
+          echo "Workspace: $GITHUB_WORKSPACE"
+          ls -la
+          find . -maxdepth 2 -type f
+
+          ZIPFILE=$(find . -maxdepth 1 -type f -name "${{ matrix.config.artifact }}" -print -quit)
 
           mkdir -p extracted
           7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE" -oextracted
@@ -72,7 +78,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $zip = Get-ChildItem "${{ matrix.config.artifact }}" -File -Recurse -Filter *.zip |
+          Get-Location
+          Write-Host "Workspace: $env:GITHUB_WORKSPACE"
+          Get-ChildItem .
+          Get-ChildItem . -Recurse -File | Select-Object FullName
+
+          $zip = Get-ChildItem . -File -Filter "${{ matrix.config.artifact }}" |
           Select-Object -First 1
           
           New-Item -ItemType Directory -Force -Path extracted | Out-Null
