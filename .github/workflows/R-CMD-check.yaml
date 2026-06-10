@@ -21,7 +21,7 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
           - {os: windows-latest, r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
-          - {os: ubuntu-latest,   r: 'release', artifact: "*_win.tar.gz.zip"}
+          - {os: ubuntu-latest,   r: 'release', artifact: "*_win.zip.zip"}
 
     env:
       PACKAGE_PASSWORD: ${{ secrets.PACKAGE_PASSWORD }}
@@ -67,8 +67,7 @@ jobs:
           $zip = Get-ChildItem ${{ matrix.config.artifact }} | Select-Object -First 1
           7z x "-p${env:PACKAGE_PASSWORD}" $zip.FullName
 
-          $tar = Get-ChildItem *.tar.gz | Select-Object -First 1
-          "TARFILE=$($tar.Name)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "TARFILE=$($zip.Name)" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
