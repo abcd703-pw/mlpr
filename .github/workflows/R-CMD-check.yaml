@@ -79,4 +79,3 @@ jobs:
         shell: bash
         run: |
           R CMD check "$TARFILE" --no-manual --as-cran --compact-vignettes=gs+qpdf
-    ```

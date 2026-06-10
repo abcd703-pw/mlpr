@@ -87,4 +87,3 @@ jobs:
 
       - name: Deploy GitHub Pages
         uses: actions/deploy-pages@v4
-```
