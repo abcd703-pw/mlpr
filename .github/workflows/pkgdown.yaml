@@ -44,10 +44,15 @@ jobs:
         run: |
           python -c "import numpy; import tqdm"
 
+      - name: Install 7-Zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+
       - name: Extract encrypted archive
         run: |
           ZIPFILE=$(ls *.tar.gz.zip | head -n 1)
-          unzip -P "$PACKAGE_PASSWORD" "$ZIPFILE"
+          7z x -P "$PACKAGE_PASSWORD" "$ZIPFILE"
 
       - name: Locate tarball
         run: |
