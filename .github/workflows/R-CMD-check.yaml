@@ -60,7 +60,6 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          - name: Debug files
           pwd
           echo "Workspace: $GITHUB_WORKSPACE"
           ls -la
@@ -78,20 +77,24 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Get-Location
-          Write-Host "Workspace: $env:GITHUB_WORKSPACE"
-          Get-ChildItem .
-          Get-ChildItem . -Recurse -File | Select-Object FullName
-
           $zip = Get-ChildItem . -File -Filter "${{ matrix.config.artifact }}" |
           Select-Object -First 1
           
           New-Item -ItemType Directory -Force -Path extracted | Out-Null
           7z x "-p${env:PACKAGE_PASSWORD}" $zip.FullName "-oextracted"
-          
-          $tar = Get-ChildItem extracted -File -Recurse -Filter *.zip |
+
+          $innerZip = Get-ChildItem extracted -Recurse -File -Filter "*.zip" |
           Select-Object -First 1
-          "TARFILE=$($tar.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+          $pkgDir = "pkg"
+          New-Item -ItemType Directory -Force $pkgDir | Out-Null
+          7z x $innerZip.FullName "-o$pkgDir"
+
+          $desc = Get-ChildItem $pkgDir -Recurse -File -Filter "DESCRIPTION" |
+          Select-Object -First 1
+
+          $pkgRoot = Split-Path $desc.FullName -Parent
+          "TARFILE=$pkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -102,4 +105,4 @@ jobs:
       - name: Run R CMD check
         shell: bash
         run: |
-          R CMD check "$TARFILE" --no-manual --as-cran --compact-vignettes=gs+qpdf
+          R CMD check "$TARFILE" --no-manual --as-cran
