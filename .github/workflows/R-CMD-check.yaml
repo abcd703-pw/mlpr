@@ -1,0 +1,84 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+name: R-CMD-check.yaml
+
+permissions: read-all
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
+          - {os: windows-latest, r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
+          - {os: ubuntu-latest,   r: 'release', artifact: "*_win.tar.gz.zip"}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      PACKAGE_PASSWORD: ${{ secrets.PACKAGE_PASSWORD }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install numpy tqdm
+
+      - name: Configure reticulate Python
+        run: |
+          python -c "import numpy; import tqdm"
+
+      - name: Extract encrypted archive (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          ZIPFILE=$(ls ${{ matrix.config.artifact }} | head -n 1)
+          unzip -P "$PACKAGE_PASSWORD" "$ZIPFILE"
+
+          TARFILE=$(ls *.tar.gz | head -n 1)
+          echo "TARFILE=$TARFILE" >> $GITHUB_ENV
+
+      - name: Extract encrypted archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem ${{ matrix.config.artifact }} | Select-Object -First 1
+          7z x "-p${env:PACKAGE_PASSWORD}" $zip.FullName
+
+          $tar = Get-ChildItem *.tar.gz | Select-Object -First 1
+          "TARFILE=$($tar.Name)" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Setup R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - name: Run R CMD check
+        shell: bash
+        run: |
+          R CMD check "$TARFILE" --no-manual --as-cran --compact-vignettes=gs+qpdf
+    ```
