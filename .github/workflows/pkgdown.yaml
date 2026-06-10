@@ -51,12 +51,13 @@ jobs:
 
       - name: Extract encrypted archive
         run: |
-          ZIPFILE=$(ls *.tar.gz.zip | head -n 1)
-          7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE"
 
-      - name: Locate tarball
-        run: |
-          TARFILE=$(ls *.tar.gz | head -n 1)
+          ZIPFILE=$(find . -type f -name "*.tar.gz.zip" -print -quit)
+          
+          mkdir -p extracted
+          7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE" -oextracted
+          
+          TARFILE=$(find extracted -type f -name "*.tar.gz" -print -quit)
           echo "TARFILE=$TARFILE" >> $GITHUB_ENV
 
       - name: Extract package source
@@ -70,7 +71,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen
+          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest
           needs: website
 
       - name: Install package dependencies
