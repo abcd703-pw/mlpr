@@ -108,4 +108,16 @@ jobs:
       - name: Run R CMD check
         shell: bash
         run: |
-          R CMD check "$TARFILE" --no-manual --as-cran
+          echo "Raw PKGDIR=$TARFILE"
+          TARFILE_UNIX=$(cygpath -u "$TARFILE")
+          echo "Converted PKGDIR=$PKGDIR_UNIX"
+          R CMD check "$TARFILE_UNIX" --no-manual --as-cran
+
+      - name: Upload R CMD check logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r-check-logs
+          path: |
+            **/*.Rcheck/
+            **/00check.log

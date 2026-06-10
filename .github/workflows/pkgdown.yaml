@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           echo "PKGDIR=$PKGDIR"
-          echp "TARFILE=$TARFILE"
+          echo "TARFILE=$TARFILE"
           ls -la "$PKGDIR"
 
       - uses: r-lib/actions/setup-r-dependencies@v2
