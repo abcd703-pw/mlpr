@@ -51,6 +51,7 @@ jobs:
           python -c "import numpy; import tqdm"
 
       - name: Install 7-Zip
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full
@@ -59,8 +60,11 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+          
           ZIPFILE=$(ls ${{ matrix.config.artifact }} | head -n 1)
-          7z x -P "$PACKAGE_PASSWORD" "$ZIPFILE"
+          7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE"
 
           TARFILE=$(ls *.tar.gz | head -n 1)
           echo "TARFILE=$TARFILE" >> $GITHUB_ENV

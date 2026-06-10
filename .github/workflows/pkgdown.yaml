@@ -52,7 +52,7 @@ jobs:
       - name: Extract encrypted archive
         run: |
           ZIPFILE=$(ls *.tar.gz.zip | head -n 1)
-          7z x -P "$PACKAGE_PASSWORD" "$ZIPFILE"
+          7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE"
 
       - name: Locate tarball
         run: |
