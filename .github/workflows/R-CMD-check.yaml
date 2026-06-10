@@ -24,7 +24,6 @@ jobs:
           - {os: ubuntu-latest,   r: 'release', artifact: "*_win.tar.gz.zip"}
 
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       PACKAGE_PASSWORD: ${{ secrets.PACKAGE_PASSWORD }}
       R_KEEP_PKG_SOURCE: yes
 
