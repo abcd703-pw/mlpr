@@ -60,11 +60,6 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          pwd
-          echo "Workspace: $GITHUB_WORKSPACE"
-          ls -la
-          find . -maxdepth 2 -type f
-
           ZIPFILE=$(find . -maxdepth 1 -type f -name "${{ matrix.config.artifact }}" -print -quit)
 
           mkdir -p extracted
@@ -84,6 +79,8 @@ jobs:
           Remove-Item $extractRoot -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $extractRoot | Out-Null
 
+          7z x "-p${env:PACKAGE_PASSWORD}" $zip.FullName "-o$extractRoot"
+
           $innerZip = Get-ChildItem $extractRoot  -Recurse -File -Filter "*.zip" |
           Select-Object -First 1
 
@@ -99,7 +96,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: .
-          extra-packages: any::rcmdcheck, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest
+          extra-packages: any::rcmdcheck, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::remotes
           needs: check
 
       - name: Run R CMD check
