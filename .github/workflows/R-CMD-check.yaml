@@ -99,6 +99,12 @@ jobs:
           extra-packages: any::rcmdcheck, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::remotes
           needs: check
 
+      - name: Debug package input
+        shell: bash
+        run: |
+          echo "PKGDIR=$TARFILE"
+          ls -la "$TARFILE"
+
       - name: Run R CMD check
         shell: bash
         run: |

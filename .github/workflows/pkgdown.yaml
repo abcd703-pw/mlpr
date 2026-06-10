@@ -69,9 +69,17 @@ jobs:
           PKGDIR=$(tar -tzf "$TARFILE" | head -n 1 | cut -d/ -f1)
           echo "PKGDIR=$PKGDIR" >> $GITHUB_ENV
 
+      - name: Debug package input
+        shell: bash
+        run: |
+          echo "PKGDIR=$PKGDIR"
+          echp "TARFILE=$TARFILE"
+          ls -la "$PKGDIR"
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest
+          working-directory: .
+          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::remotes
           needs: website
 
       - name: Install package dependencies
