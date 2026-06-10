@@ -86,11 +86,9 @@ jobs:
           $innerZip = Get-ChildItem extracted -Recurse -File -Filter "*.zip" |
           Select-Object -First 1
 
-          $pkgDir = "pkg"
-          New-Item -ItemType Directory -Force $pkgDir | Out-Null
-          7z x $innerZip.FullName "-o$pkgDir"
+          7z x $innerZip.FullName "-oextracted"
 
-          $desc = Get-ChildItem $pkgDir -Recurse -File -Filter "DESCRIPTION" |
+          $desc = Get-ChildItem extracted -Recurse -File -Filter "DESCRIPTION"  |
           Select-Object -First 1
 
           $pkgRoot = Split-Path $desc.FullName -Parent
@@ -99,6 +97,7 @@ jobs:
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          working-directory: .
           extra-packages: any::rcmdcheck, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest
           needs: check
 
