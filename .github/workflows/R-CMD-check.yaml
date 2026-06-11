@@ -92,14 +92,14 @@ jobs:
 
 
           $pkgRoot = Split-Path $desc.FullName -Parent
-          "TARFILE_RAW=$pkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "PKGROOT=$pkgRoot"  | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Change Windows to Unix dir
-        if: runner.os == 'Windows'
-        shell: bash
-        run: |
-          TARFILE=$(cygpath -u "$TARFILE_RAW")
-          echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
+      # - name: Change Windows to Unix dir
+      #   if: runner.os == 'Windows'
+      #   shell: bash
+      #   run: |
+      #     TARFILE=$(cygpath -u "$TARFILE_RAW")
+      #     echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
       
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -108,16 +108,41 @@ jobs:
           extra-packages: any::rcmdcheck, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::remotes
           needs: check
 
+      - name: Prepare reticulate environment
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          Rscript -e "library(reticulate); py_require(c('numpy','tqdm'))"
+
+      - name: Verify reticulate environment
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          Rscript -e "library(reticulate); import('numpy'); import('tqdm')"
+
       - name: Debug package input
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           echo "PKGDIR=$TARFILE"
           ls -la "$TARFILE"
 
       - name: Run R CMD check
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           R CMD check "$TARFILE" --no-manual --as-cran
+
+      - name: Validate Windows package
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "PKGROOT=$env:PKGROOT"
+
+          Rscript -e ".libPaths(c(dirname('$env:PKGROOT'), .libPaths())); library(mlpr);
+            cat('Package loaded successfully\n'); sessionInfo()"
+
+          Rscript -e ".libPaths(c(dirname('$env:PKGROOT'), .libPaths())); tinytest::test_package('mlpr')"
 
       - name: Upload R CMD check logs
         if: failure()
@@ -127,3 +152,4 @@ jobs:
           path: |
             **/*.Rcheck/
             **/00check.log
+            **/00install.out

@@ -60,6 +60,12 @@ jobs:
           TARFILE=$(find extracted -type f -name "*.tar.gz" -print -quit)
           echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
 
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: .
+          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::pkgdown
+          needs: website
+
       - name: Extract package source
         run: |
           tar -xzf "$TARFILE"
@@ -80,12 +86,6 @@ jobs:
       #   run: |
       #     Rscript -e 'install.packages(c("reticulate", "Rcpp", "RcppEigen", "tinytest", "remotes", "pkgdown"))'
 
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          working-directory: .
-          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::pkgdown
-          needs: website
 
       - name: Install package dependencies
         run: |
