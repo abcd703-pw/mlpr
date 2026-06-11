@@ -95,6 +95,12 @@ jobs:
           "TARFILE_RAW=$pkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
           TARFILE=$(cygpath -u "$TARFILE_RAW")
 
+      - name: Change Windows to Unix dir
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          TARFILE=$(cygpath -u "$TARFILE_RAW")
+      
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -106,7 +112,7 @@ jobs:
         shell: bash
         run: |
           echo "PKGDIR=$TARFILE"
-          ls -la "$TARFILE_RAW"
+          ls -la "$TARFILE"
 
       - name: Run R CMD check
         shell: bash

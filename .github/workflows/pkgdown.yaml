@@ -78,7 +78,7 @@ jobs:
 
       - name: Install package dependencies
         run: |
-          Rscript -e 'install.packages(c("reticulate", "Rcpp", "RcppEigen", "tinytest"))'
+          Rscript -e 'install.packages(c("reticulate", "Rcpp", "RcppEigen", "tinytest", "remotes", "pkgdown"))'
 
 
       # - uses: r-lib/actions/setup-r-dependencies@v2
