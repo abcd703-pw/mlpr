@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-13,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
+          - {os: macos-14,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
           - {os: windows-latest, r: 'release', artifact: "*_win.zip.zip"}
           - {os: ubuntu-latest,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
 
