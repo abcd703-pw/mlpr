@@ -94,7 +94,7 @@ jobs:
       - name: Setup stable reticulate Python env
         shell: bash
         run: |
-          Rscript -e "Sys.setenv(RETICULATE_PYTHON=''); library(reticulate);
+          Rscript -e "library(reticulate);
             virtualenv_create('r-reticulate', python = Sys.which('python'));
             virtualenv_install('r-reticulate', c('numpy','tqdm'), ignore_installed = FALSE);
             use_virtualenv('r-reticulate', required = TRUE); py_config()"
