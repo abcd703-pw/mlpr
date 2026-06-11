@@ -50,6 +50,17 @@ jobs:
         run: |
           python -c "import numpy; import tqdm"
 
+      - name: macOS build flags
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          echo "PKG_CXXFLAGS=-DEIGEN_DONT_VECTORIZE -DEIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT" >> $GITHUB_ENV
+          echo "CXXFLAGS=-O0 -g -fno-unroll-loops -fno-vectorize -fsanitize=address,undefined" >> $GITHUB_ENV
+          echo "CXX11FLAGS=-O0 -g -fno-unroll-loops -fno-vectorize" >> $GITHUB_ENV
+          echo "LDFLAGS=-fsanitize=address,undefined" >> $GITHUB_ENV
+          echo "OMP_NUM_THREADS=1" >> $GITHUB_ENV
+          echo "VECLIB_MAXIMUM_THREADS=1" >> $GITHUB_ENV
+
       - name: Install 7-Zip
         if: runner.os == 'Linux'
         run: |
