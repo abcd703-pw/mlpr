@@ -91,6 +91,26 @@ jobs:
         run: |
           Rscript -e 'remotes::install_deps(Sys.getenv("PKGDIR"), dependencies = TRUE, upgrade = "never")'
 
+      - name: Setup stable reticulate Python env
+        shell: bash
+        run: |
+          Rscript -e "Sys.setenv(RETICULATE_PYTHON=''); library(reticulate);
+            virtualenv_create('r-reticulate', python = Sys.which('python'));
+            virtualenv_install('r-reticulate', c('numpy','tqdm'), ignore_installed = FALSE);
+            use_virtualenv('r-reticulate', required = TRUE); py_config()"
+
+      - name: Prepare reticulate environment
+        shell: bash
+        run: |
+          Rscript -e "library(reticulate); py_require(c('numpy','tqdm'))"
+
+      - name: Verify reticulate environment
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          Rscript -e "library(reticulate); import('numpy'); import('tqdm')"
+      
+      
       - name: Install package
         run: |
           R CMD INSTALL "$TARFILE"

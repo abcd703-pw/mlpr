@@ -100,16 +100,7 @@ jobs:
       #   run: |
       #     TARFILE=$(cygpath -u "$TARFILE_RAW")
       #     echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
-      
-      - name: Setup stable reticulate Python env
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          Rscript -e "Sys.setenv(RETICULATE_PYTHON=''); library(reticulate);
-            virtualenv_create('r-reticulate', python = Sys.which('python'));
-            virtualenv_install('r-reticulate', c('numpy','tqdm'), ignore_installed = FALSE);
-            use_virtualenv('r-reticulate', required = TRUE); py_config()
-          "
+    
       
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -117,6 +108,15 @@ jobs:
           working-directory: .
           extra-packages: any::rcmdcheck, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::remotes
           needs: check
+
+      - name: Setup stable reticulate Python env
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          Rscript -e "Sys.setenv(RETICULATE_PYTHON=''); library(reticulate);
+            virtualenv_create('r-reticulate', python = Sys.which('python'));
+            virtualenv_install('r-reticulate', c('numpy','tqdm'), ignore_installed = FALSE);
+            use_virtualenv('r-reticulate', required = TRUE); py_config()"
 
       - name: Prepare reticulate environment
         if: runner.os != 'Windows'
@@ -156,7 +156,7 @@ jobs:
 
           Rscript -e "pkgroot <- normalizePath(Sys.getenv('PKGROOT'), winslash='/');
             .libPaths(c(dirname(pkgroot), .libPaths())); tinytest::test_package('mlpr');"
-            
+
       - name: Upload R CMD check logs
         if: failure()
         uses: actions/upload-artifact@v4
