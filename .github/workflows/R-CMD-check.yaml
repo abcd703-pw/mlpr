@@ -93,7 +93,6 @@ jobs:
 
           $pkgRoot = Split-Path $desc.FullName -Parent
           "TARFILE_RAW=$pkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
-          TARFILE=$(cygpath -u "$TARFILE_RAW")
 
       - name: Change Windows to Unix dir
         if: runner.os == 'Windows'

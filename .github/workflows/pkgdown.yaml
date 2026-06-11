@@ -76,16 +76,16 @@ jobs:
           echo "TARFILE=$TARFILE"
           ls -la "$PKGDIR"
 
-      - name: Install package dependencies
-        run: |
-          Rscript -e 'install.packages(c("reticulate", "Rcpp", "RcppEigen", "tinytest", "remotes", "pkgdown"))'
+      # - name: Install package dependencies
+      #   run: |
+      #     Rscript -e 'install.packages(c("reticulate", "Rcpp", "RcppEigen", "tinytest", "remotes", "pkgdown"))'
 
 
-      # - uses: r-lib/actions/setup-r-dependencies@v2
-      #   with:
-      #     working-directory: .
-      #     extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest
-      #     needs: website
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: .
+          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::pkgdown
+          needs: website
 
       - name: Install package dependencies
         run: |
