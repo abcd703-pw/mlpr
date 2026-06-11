@@ -99,6 +99,7 @@ jobs:
         shell: bash
         run: |
           TARFILE=$(cygpath -u "$TARFILE_RAW")
+          echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
       
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2

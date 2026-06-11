@@ -58,7 +58,7 @@ jobs:
           7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE" -oextracted
           
           TARFILE=$(find extracted -type f -name "*.tar.gz" -print -quit)
-          echo "TARFILE=$TARFILE" >> $GITHUB_ENV
+          echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
 
       - name: Extract package source
         run: |
@@ -67,7 +67,7 @@ jobs:
       - name: Detect package directory
         run: |
           PKGDIR=$(tar -tzf "$TARFILE" | head -n 1 | cut -d/ -f1)
-          echo "PKGDIR=$PKGDIR" >> $GITHUB_ENV
+          echo "PKGDIR=$PKGDIR" >> "$GITHUB_ENV"
 
       - name: Debug package input
         shell: bash
