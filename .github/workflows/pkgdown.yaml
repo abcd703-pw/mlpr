@@ -63,7 +63,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: .
-          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::pkgdown
+          extra-packages: any::pkgdown, any::reticulate, any::Rcpp, any::RcppEigen, any::tinytest, any::pkgdown, any::remotes
           needs: website
 
       - name: Extract package source

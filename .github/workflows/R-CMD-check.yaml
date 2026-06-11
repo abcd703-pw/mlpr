@@ -101,6 +101,16 @@ jobs:
       #     TARFILE=$(cygpath -u "$TARFILE_RAW")
       #     echo "TARFILE=$TARFILE" >> "$GITHUB_ENV"
       
+      - name: Setup stable reticulate Python env
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          Rscript -e "Sys.setenv(RETICULATE_PYTHON=''); library(reticulate);
+            virtualenv_create('r-reticulate', python = Sys.which('python'));
+            virtualenv_install('r-reticulate', c('numpy','tqdm'), ignore_installed = FALSE);
+            use_virtualenv('r-reticulate', required = TRUE); py_config()
+          "
+      
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -137,13 +147,16 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Write-Host "PKGROOT=$env:PKGROOT"
+          $pkgRoot = $env:PKGROOT
+          $pkgRoot = [System.IO.Path]::GetFullPath($pkgRoot)
 
-          Rscript -e ".libPaths(c(dirname('$env:PKGROOT'), .libPaths())); library(mlpr);
-            cat('Package loaded successfully\n'); sessionInfo()"
+          Rscript -e "pkgroot <- normalizePath(Sys.getenv('PKGROOT'), winslash='/');
+            .libPaths(c(dirname(pkgroot), .libPaths()));library(mlpr);
+            cat('Package loaded successfully\n'); sessionInfo();"
 
-          Rscript -e ".libPaths(c(dirname('$env:PKGROOT'), .libPaths())); tinytest::test_package('mlpr')"
-
+          Rscript -e "pkgroot <- normalizePath(Sys.getenv('PKGROOT'), winslash='/');
+            .libPaths(c(dirname(pkgroot), .libPaths())); tinytest::test_package('mlpr');"
+            
       - name: Upload R CMD check logs
         if: failure()
         uses: actions/upload-artifact@v4
