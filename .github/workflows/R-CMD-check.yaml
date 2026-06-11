@@ -87,10 +87,13 @@ jobs:
           7z x $innerZip.FullName "-o$extractRoot"
 
           $desc = Get-ChildItem $extractRoot -Recurse -File -Filter "DESCRIPTION"  |
+          Where-Object { (Get-Content $_.FullName -Raw) -match "^Package:" } |
           Select-Object -First 1
 
+
           $pkgRoot = Split-Path $desc.FullName -Parent
-          "TARFILE=$pkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "TARFILE_RAW=$pkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
+          TARFILE=$(cygpath -u "$TARFILE_RAW")
 
       - name: Setup R dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
@@ -103,15 +106,12 @@ jobs:
         shell: bash
         run: |
           echo "PKGDIR=$TARFILE"
-          ls -la "$TARFILE"
+          ls -la "$TARFILE_RAW"
 
       - name: Run R CMD check
         shell: bash
         run: |
-          echo "Raw PKGDIR=$TARFILE"
-          TARFILE_UNIX=$(cygpath -u "$TARFILE")
-          echo "Converted PKGDIR=$PKGDIR_UNIX"
-          R CMD check "$TARFILE_UNIX" --no-manual --as-cran
+          R CMD check "$TARFILE" --no-manual --as-cran
 
       - name: Upload R CMD check logs
         if: failure()
