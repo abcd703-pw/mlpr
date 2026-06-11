@@ -19,9 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-12,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
-          - {os: windows-latest, r: 'release', artifact: "*_win.zip.zip"}
-          - {os: ubuntu-latest,   r: 'release', artifact: "*_linux_macos.tar.gz.zip"}
+          - {os: macos-12,   r: 'release', artifact: "*_linux_macos.tar.gz.7z"}
+          - {os: windows-latest, r: 'release', artifact: "*_win.zip.7z"}
+          - {os: ubuntu-latest,   r: 'release', artifact: "*_linux_macos.tar.gz.7z"}
 
     env:
       PACKAGE_PASSWORD: ${{ secrets.PACKAGE_PASSWORD }}

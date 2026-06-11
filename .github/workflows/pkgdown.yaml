@@ -56,7 +56,7 @@ jobs:
       - name: Extract encrypted archive
         run: |
 
-          ZIPFILE=$(find . -type f -name "*.tar.gz.zip" -print -quit)
+          ZIPFILE=$(find . -type f -name "*.tar.gz.7z" -print -quit)
           
           mkdir -p extracted
           7z x -p"$PACKAGE_PASSWORD" "$ZIPFILE" -oextracted
